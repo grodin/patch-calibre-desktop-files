@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Joseph Cooper (cooper.joseph@gmail.com)"]
 license = "MIT"
-license-file = "LICENSE"
+description = "Utility to patch .desktop files installed by Calibre."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
