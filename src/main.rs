@@ -13,6 +13,8 @@ fn main() -> eyre::Result<()> {
     color_eyre::install()?;
     let args = Cli::parse();
 
+    let file_count = args.input_files.iter().count();
+
     for input_file in &args.input_files {
         let desktop_file = Entry::parse_file(input_file)
             .wrap_err_with(|| format!("Error parsing file {}", input_file.to_string_lossy()))?;
@@ -20,12 +22,16 @@ fn main() -> eyre::Result<()> {
         let buf = process_file(&desktop_file)
             .wrap_err_with(|| format!("Error processing file {}", input_file.to_string_lossy()))?;
 
-        if !args.dry_run {
+        if args.dry_run {
+            // Print each file name before dry run contents if there's more than one
+            if file_count > 1 {
+                println!("{}:", input_file.to_string_lossy());
+            }
+            println!("{}", String::from_utf8_lossy(&buf));
+        } else {
             fs::write(input_file, &buf).wrap_err_with(|| {
                 format!("Error writing to file {}", input_file.to_string_lossy())
             })?;
-        } else {
-            println!("{}", String::from_utf8_lossy(&buf));
         }
     }
     Ok(())
