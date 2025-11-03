@@ -104,6 +104,9 @@ const X_MARKDOWN: Name = Name::new_unchecked("x-markdown");
 static MIME_TYPES_KEY: &str = "MimeType";
 static DESKTOP_ENTRY_SECTION: &str = "Desktop Entry";
 
+// Keeping the keys statically defined allows maintaining the order as listed here
+// The alternative, reading the keys back from the parsed Entry, loses the ordering
+// and for now, I can't be bothered to try to find a way to retain the ordering
 static KEYS: [&str; 10] = [
     "Version",
     "Type",
