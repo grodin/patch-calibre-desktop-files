@@ -1,3 +1,4 @@
+use atomic_write_file::AtomicWriteFile;
 use clap::Parser;
 use color_eyre::eyre;
 use color_eyre::eyre::{ensure, eyre, WrapErr};
@@ -5,7 +6,6 @@ use freedesktop_entry_parser::Entry;
 use itertools::Itertools;
 use mediatype::names::{APPLICATION, TEXT};
 use mediatype::{media_type, MediaType, MediaTypeError, Name};
-use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 
@@ -15,22 +15,32 @@ fn main() -> eyre::Result<()> {
 
     let file_count = args.input_files.iter().count();
 
-    for input_file in &args.input_files {
-        let desktop_file = Entry::parse_file(input_file)
-            .wrap_err_with(|| format!("Error parsing file {}", input_file.to_string_lossy()))?;
+    for input_file_path in &args.input_files {
+        let desktop_file = Entry::parse_file(input_file_path).wrap_err_with(|| {
+            format!("Error parsing file {}", input_file_path.to_string_lossy())
+        })?;
 
-        let buf = process_file(&desktop_file)
-            .wrap_err_with(|| format!("Error processing file {}", input_file.to_string_lossy()))?;
+        let buf = process_file(&desktop_file).wrap_err_with(|| {
+            format!(
+                "Error processing file {}",
+                input_file_path.to_string_lossy()
+            )
+        })?;
 
         if args.dry_run {
             // Print each file name before dry run contents if there's more than one
             if file_count > 1 {
-                println!("{}:", input_file.to_string_lossy());
+                println!("{}:", input_file_path.to_string_lossy());
             }
             println!("{}", String::from_utf8_lossy(&buf));
         } else {
-            fs::write(input_file, &buf).wrap_err_with(|| {
-                format!("Error writing to file {}", input_file.to_string_lossy())
+            let mut input_file = AtomicWriteFile::open(input_file_path)?;
+            input_file.write_all(&buf)?;
+            input_file.commit().wrap_err_with(|| {
+                format!(
+                    "Error writing to file {}",
+                    input_file_path.to_string_lossy()
+                )
             })?;
         }
     }

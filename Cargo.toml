@@ -1,6 +1,6 @@
 [package]
 name = "patch-calibre-desktop-files"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Joseph Cooper (cooper.joseph@gmail.com)"]
 license = "MIT"
@@ -9,6 +9,7 @@ description = "Utility to patch .desktop files installed by Calibre."
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+atomic-write-file = "0.3.0"
 clap = { version = "4.2.2", features = ["derive", "env"] }
 color-eyre = { version = "0.6.2", default-features = false }
 freedesktop_entry_parser = "1.3.0"
