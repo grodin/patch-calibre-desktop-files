@@ -69,7 +69,7 @@ fn process_file(desktop_file: &Entry) -> eyre::Result<Vec<u8>> {
 
     let filtered_mime_types = mime_types
         .iter()
-        .filter(|&m| DISALLOWED_MEDIA_TYPES.iter().any(|e| e != m))
+        .filter(|&m| DISALLOWED_MEDIA_TYPES.iter().all(|e| e != m))
         .join(";");
 
     let mut buf = Vec::new();
