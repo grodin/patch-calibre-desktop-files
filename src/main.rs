@@ -20,8 +20,13 @@ fn main() -> eyre::Result<()> {
         let buf = process_file(&desktop_file)
             .wrap_err_with(|| format!("Error processing file {}", input_file.to_string_lossy()))?;
 
-        fs::write(input_file, &buf)
-            .wrap_err_with(|| format!("Error writing to file {}", input_file.to_string_lossy()))?;
+        if !args.dry_run {
+            fs::write(input_file, &buf).wrap_err_with(|| {
+                format!("Error writing to file {}", input_file.to_string_lossy())
+            })?;
+        } else {
+            println!("{}", String::from_utf8_lossy(&buf));
+        }
     }
     Ok(())
 }
@@ -102,4 +107,7 @@ struct Cli {
     /// .desktop files to process
     #[arg(required = true)]
     input_files: Vec<PathBuf>,
+    /// dry run
+    #[arg(long, short('n'))]
+    dry_run: bool,
 }
